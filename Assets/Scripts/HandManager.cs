@@ -12,12 +12,19 @@ public class HandManager : MonoBehaviour
     private bool rightHandRecording = false;
     private bool leftHandCapturing = false;
     private bool rightHandCapturing = false;
+    [HideInInspector]
     public bool IsRecording = false;
+    [HideInInspector]
     public bool IsCapturing = false;
+
+    public QuadManager quadManager;
+    public EnemyManager enemy;
+
+    public Material HandMaterial;
 
     public TMP_Text TMPtext;
 
-UnityEvent recording;
+    UnityEvent recording;
     UnityEvent capturing;
 
     void Start()
@@ -30,6 +37,7 @@ UnityEvent recording;
 
         recording.AddListener(Recording);
         capturing.AddListener(Capturing);
+
     }
 
     
@@ -72,11 +80,13 @@ UnityEvent recording;
     public void LeftHandNotCapturing()
     {
         leftHandCapturing = false;
+        capturing.Invoke();
     }
 
     public void RightHandNotCapturing()
     {
         rightHandCapturing = false;
+        capturing.Invoke();
     }
 
     private void Recording()
@@ -94,14 +104,22 @@ UnityEvent recording;
         }
     }
 
+
     private void Capturing()
     {
-        if (leftHandCapturing && rightHandCapturing && IsRecording)
+        if (leftHandCapturing && rightHandCapturing)
         {
             IsCapturing = true;
             IsRecording = false;
             Debug.Log("Capturing!");
             TMPtext.text = "Capturing!";
+
+            HandMaterial.SetColor("_ColorTop", new Vector4(0, 255, 0, 255));
+
+            if (quadManager.aim)
+            {
+                enemy.relocate.Invoke();
+            }
         }
         else
         {
@@ -110,6 +128,8 @@ UnityEvent recording;
                 $"\nleftHandRecording: {leftHandRecording} rightHandRecording: {rightHandRecording}");
             TMPtext.text = $"Not Capturing! leftHandCapturing: {leftHandCapturing} rightHandCapturing: {rightHandCapturing}" +
                 $"\nleftHandRecording: {leftHandRecording} rightHandRecording: {rightHandRecording}";
+
+            HandMaterial.SetColor("_ColorTop", new Vector4(50, 52, 54, 255));
         }
     }
 }
